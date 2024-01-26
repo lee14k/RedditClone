@@ -12,6 +12,7 @@
     "@types/node": "20.4.5",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.14",
+    "dotenv": "^16.4.1",
     "mysql2": "^3.9.0",
     "next": "13.4.12",
     "postcss": "8.4.27",
