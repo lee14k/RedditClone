@@ -9,8 +9,11 @@ interface Post {
 
 // Define the loader function
 export async function loader(req: NextRequest) {
-  const response = await fetch(`${process.env.API_URL}/api/posts`);
+  const response = await fetch('/api/posts/');
+  console.log(req)
+  console.log(response)
   const posts: Post[] = await response.json();
+  console.log(posts)
   return { props: { posts } }; // Ensure this matches the expected return structure
 }
 
@@ -21,12 +24,16 @@ interface PageProps {
 function Page({ posts }: PageProps) {
   return (
     <div>
-      {posts.map((post) => (
-        <div key={post.id}>
-          <h2>{post.title}</h2>
-          <p>{post.content}</p>
-        </div>
-      ))}
+      {Array.isArray(posts) ? (
+        posts.map((post) => (
+          <div key={post.id}>
+            <h2>{post.title}</h2>
+            <p>{post.content}</p>
+          </div>
+        ))
+      ) : (
+        <p>Loading posts...</p> // Or some other placeholder content
+      )}
     </div>
   );
 }

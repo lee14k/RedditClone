@@ -1,5 +1,4 @@
-// app/api/posts.ts
-import { NextApiRequest, NextApiResponse } from 'next';
+// app/api/posts/route.ts
 import mysql from 'mysql2/promise';
 
 async function connectToDatabase() {
@@ -7,18 +6,27 @@ async function connectToDatabase() {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: process.env.DATABASE,
+    database: process.env.DB_DATABASE,
   });
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function GET() {
   try {
     const db = await connectToDatabase();
     const [posts] = await db.query('SELECT * FROM posts');
-
-    res.status(200).json(posts);
+    return new Response(JSON.stringify(posts), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (error) {
     console.error('Error fetching posts:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 }
