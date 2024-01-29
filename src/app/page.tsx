@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react';
-
+import Link from 'next/link';
 interface Post {
   post_id: string; // Adjust types as needed
   title: string;
@@ -29,7 +29,14 @@ function HomePage() {
           <p>{post.content}</p>
         </div>
       ))}
+
+      <Link href="/register">
+        <button>
+          make a new account
+        </button>
+        </Link>
     </div>
+
   );
 }
 

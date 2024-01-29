@@ -6,22 +6,43 @@ function RegistrationForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleRegistration = async (e) => {
+  const handleRegistration = async (e: { preventDefault: () => void; }) => {
+    console.log('Form submission triggered');
     e.preventDefault();
-    // Send a POST request to your registration API endpoint
-    const response = await fetch('/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    });
+  
+    // Ensure both username and password are provided
+    if (!username || !password) {
+      console.error('Username and password are required');
+      // Optionally, display an error message to the user
+      return;
+    }
+  
+    try {
+        console.log('Sending registration data:', { username, password });
 
-    if (response.ok) {
-      // Registration was successful
-      // Redirect or show a success message
-    } else {
-      // Registration failed, handle errors
+      const response = await fetch('/api/register', {
+        
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+        
+      });
+  
+      if (response.ok) {
+        // Registration was successful
+        // Redirect or show a success message
+        console.log('Registration successful');
+      } else {
+        // Registration failed, handle errors
+        const errorData = await response.json();
+        console.error('Registration failed:', errorData);
+        // Optionally, display an error message to the user
+      }
+    } catch (error) {
+      console.error('Error sending registration request:', error);
+      // Optionally, display an error message to the user
     }
   };
 
