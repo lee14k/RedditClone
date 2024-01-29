@@ -1,41 +1,36 @@
-// pages/somePage.tsx (or wherever your page component is located)
-import type { NextRequest } from 'next/server';
+'use client'
+import { useEffect, useState } from 'react';
 
 interface Post {
-  id: number;
+  post_id: string; // Adjust types as needed
   title: string;
   content: string;
 }
 
-// Define the loader function
-export async function loader(req: NextRequest) {
-  const response = await fetch('/api/posts/');
-  console.log(req)
-  console.log(response)
-  const posts: Post[] = await response.json();
-  console.log(posts)
-  return { props: { posts } }; // Ensure this matches the expected return structure
-}
+function HomePage() {
+  const [posts, setPosts] = useState<Post[]>([]);
 
-interface PageProps {
-  posts: Post[];
-}
+  useEffect(() => {
+    fetch('/api/posts') // Fetch data from your API route
+      .then((response) => response.json())
+      .then((data: Post[]) => {
+        setPosts(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching posts:', error);
+      });
+  }, []);
 
-function Page({ posts }: PageProps) {
   return (
     <div>
-      {Array.isArray(posts) ? (
-        posts.map((post) => (
-          <div key={post.id}>
-            <h2>{post.title}</h2>
-            <p>{post.content}</p>
-          </div>
-        ))
-      ) : (
-        <p>Loading posts...</p> // Or some other placeholder content
-      )}
+      {posts.map((post) => (
+        <div key={post.post_id}>
+          <h2>{post.title}</h2>
+          <p>{post.content}</p>
+        </div>
+      ))}
     </div>
   );
 }
 
-export default Page;
+export default HomePage;
