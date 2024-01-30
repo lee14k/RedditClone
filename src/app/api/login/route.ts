@@ -1,5 +1,8 @@
-import { NextApiRequest } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
 import mysql, { RowDataPacket } from 'mysql2/promise';
+import { serialize } from 'cookie';
+import { randomBytes } from 'crypto';
+
 
 async function connectToDatabase() {
     return await mysql.createConnection({
@@ -10,7 +13,7 @@ async function connectToDatabase() {
     });
 }
 
-export async function POST(req: NextApiRequest) {
+export async function POST(req: NextApiRequest, res: NextApiResponse) {
     try {
         const rawData = await req.body.getReader().read();
         const jsonString = new TextDecoder().decode(rawData.value);
@@ -39,16 +42,26 @@ export async function POST(req: NextApiRequest) {
             });
         }
 
-        return new Response(JSON.stringify({ message: 'Login successful', username: user.username }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        // Set the authentication cookie
+        const authToken = generateToken(); // Replace with actual token generation logic
 
+        const cookieOptions = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict' as 'strict' | 'lax' | 'none', // Correctly typed
+            maxAge: 3600, // Set the expiration time for the cookie in seconds
+            path: '/',
+        };
+        const cookie = serialize('authToken', authToken, cookieOptions);
+        res.setHeader('Set-Cookie', cookie);
+
+        res.status(200).json({ message: 'Login successful', username: user.username });
     } catch (error) {
         console.error('Error during login:', error);
-        return new Response(JSON.stringify({ error: 'Internal server error' }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        res.status(500).json({ error: 'Internal server error' });
     }
+
+function generateToken() {
+    return randomBytes(48).toString('hex');
+  }
 }
