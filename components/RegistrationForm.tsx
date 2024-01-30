@@ -18,7 +18,6 @@ function RegistrationForm() {
     }
   
     try {
-        console.log('Sending registration data:', { username, password });
 
       const response = await fetch('/api/register', {
         
